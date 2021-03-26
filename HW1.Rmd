@@ -46,26 +46,26 @@ You’ll be using RStudio to create a personal website to showcase your work fro
 Once you’ve chosen that, you might want to look through some of the other Building a website resources I posted on the resources page of our course website. I highly recommend making a nice landing page where you give a brief introduction of yourself.
 
 **Tasks:**
-###a.
+### a.
 Include a link to your website below. (If anyone does not want to post a website publicly, please talk to me and we will find a different solution).
 
 https://siguoli.netlify.app/
 
-###b.
+### b.
 Listen to at least the first 20 minutes of “Building a Career in Data Science, Chapter 4: Building a Portfolio”. Go to the main podcast website and navigate to a podcast provider that works for you to find that specific episode. Write 2-3 sentences reflecting on what they discussed and why creating a website might be helpful for you.
 
 Creating a website might help employers see my past projects when I am looking for jobs in the future, and also connect with people who have similar interests. It also enables me to share my experience and knowledge with the public, and help people who wants to do similar projects as the projects displayed on my website.
 
-###c.
+### c.
 (Optional) Create an R package with your own customized gpplot2 theme! Write a post on your website about why you made the choices you did for the theme. See the Building an R package and Custom ggplot2 themes resources.
 
 
-##Exercise 3 Machine Learning
+## Exercise 3 Machine Learning
 Read through and follow along with the Machine Learning review with an intro to the tidymodels package posted on the Course Materials page.
 
 **Tasks:**
 
-###1. 
+### 1. 
 Read about the hotel booking data, hotels, on the Tidy Tuesday page it came from. There is also a link to an article from the original authors. The outcome we will be predicting is called is_canceled.
 Without doing any analysis, what are some variables you think might be predictive and why?
 
@@ -89,7 +89,7 @@ If we construct a model, what type of conclusions will be able to draw from it?
 
 We will be able to see which factors are associated with cancellation, and we can predict the likelihood of cancellation based on these factors. (However, the association might not be causal, so we need to be careful when interpreting the results.)
 
-###2.
+### 2.
 Create some exploratory plots or table summaries of the data, concentrating most on relationships with the response variable. Keep in mind the response variable is numeric, 0 or 1. You may want to make it categorical (you also may not). Be sure to also examine missing values or other interesting values.
 
 ```{r}
@@ -155,7 +155,7 @@ hotels %>%
 ```
 
 
-###3.
+### 3.
 First, we will do a couple things to get the data ready, including making the outcome a factor (needs to be that way for logistic regression), removing the year variable and some reservation status variables, and removing missing values (not NULLs but true missing values). Split the data into a training and test set, stratifying on the outcome variable, is_canceled. Since we have a lot of data, we’re going to split the data 50/50 between training and test. I have already set.seed() for you. Be sure to use hotels_mod in the splitting.
 
 ```{r}
@@ -178,7 +178,7 @@ hotel_training <- training(hotel_split)
 hotel_testing <- testing(hotel_split)
 ```
 
-###4.
+### 4.
 In this next step, we are going to do the pre-processing. Usually, I won’t tell you exactly what to do here, but for your first exercise, I’ll tell you the steps.
 
 ```{r}
@@ -210,7 +210,7 @@ hotel_recipe %>%
   juice()
 ```
 
-###5.
+### 5.
 In this step we will set up a LASSO model and workflow.
 In general, why would we want to use LASSO instead of regular logistic regression? (HINT: think about what happens to the coefficients).
 
@@ -241,7 +241,7 @@ hotel_lasso_wf <-
   add_model(hotel_lasso_mod)
 ```
 
-###6.
+### 6.
 In this step, we’ll tune the model and fit the model using the best tuning parameter to the entire training dataset.
 
 Create a 5-fold cross-validation sample.
@@ -312,7 +312,7 @@ hotel_lasso_final_mod %>%
 
 `market_segment_Groups`, `distribution_channel_Undefined`, `assigned_room_type_L`, `assigned_room_type_P` all have coefficients equal to 0.
 
-###7.
+### 7.
 Now that we have a model, let’s evaluate it a bit more. All we have looked at so far is the cross-validated accuracy from the previous step.
 
 Create a variable importance graph. Which variables show up as the most important? Are you surprised?
@@ -356,36 +356,36 @@ preds %>%
 ```
 
 
-####a. 
+#### a. 
 What would this graph look like for a model with an accuracy that was close to 1? 
 
 The two density curves would be almost separated instead of having a lot of overlapped region.
 
-####b. 
+#### b. 
 Our predictions are classified as canceled if their predicted probability of canceling is greater than .5. If we wanted to have a high true positive rate, should we make the cutoff for predicted as canceled higher or lower than .5? 
 
 We should make the cutoff higher than 0.5, so that it becomes more likely to predict canceling, and more truly canceled cases would be predicted to be canceled.
 
-####c. 
+#### c. 
 What happens to the true negative rate if we try to get a higher true positive rate?
 
 The true negative rate would be lower because more uncanceled cases will be classified as canceled if we try to get a higher true positive rate.
 
-###8.
+### 8.
 Let’s say that this model is going to be applied to bookings 14 days in advance of their arrival at each hotel, and someone who works for the hotel will make a phone call to the person who made the booking. During this phone call, they will try to assure that the person will be keeping their reservation or that they will be canceling in which case they can do that now and still have time to fill the room. How should the hotel go about deciding who to call? How could they measure whether it was worth the effort to do the calling? Can you think of another way they might use the model?
 
 According to the outcome and VIP of this model, they should call the people who reserve room type P, whose deposit type is non-refundable, and who did have previous cancellations with the hotel. They can also input each customer's information into the model, and predict whether they would cancel according to the model, and call the people who are predicted to cancel. Also, since reserved room type and assigned room type are both important when determining whether the customer would cancel, the hotel should make a call if they need to change the room type for a customer. 
 
 Another way they might use the model is to estimate how many reservations might be canceled for each day, so that they could adjust the number of employees working that day.
 
-###9.
+### 9.
 How might you go about questioning and evaluating the model in terms of fairness? Are there any questions you would like to ask of the people who collected the data?
 
 I would most likely question the inclusion of country of origin for each customer in this model. I feel like canceling reservations is a more personal thing, and if this model indicates that people from certain countries are more likely to cancel, it would cause false stereotype against people from certain countries when they are booking hotels, and that is not fair.
 
 One question I would like to ask is what measures have they taken to ensure that their sample is general enough and what kind of selection bias might be involve in the data.
 
-##Exercise 4 Bias and Fairness
+## Exercise 4 Bias and Fairness
 Listen to Dr. Rachel Thomas’s Bias and Fairness lecture. Write a brief paragraph reflecting on it. You might also be interested in reading the ProPublica article Dr. Thomas references about using a tool called COMPAS to predict recidivism. Some questions/ideas you might keep in mind:
 
 Did you hear anything that surprised you?
