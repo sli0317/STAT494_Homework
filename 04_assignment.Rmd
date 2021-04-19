@@ -1,0 +1,218 @@
+---
+title: 'Assignment #4'
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+```{r libraries, message=FALSE}
+#Regular expressions
+library(tidyverse)        # contains stringr for regex
+library(googlesheets4)    # for reading in data
+gs4_deauth()              # to read in google sheet (or download)
+
+#tmap
+library(tmap)
+library(pacman)
+library(gifski)          # not needed since you won't do animated graphs
+
+theme_set(theme_minimal()) # Lisa's favorite theme
+```
+
+When you finish the assignment, remove the `#` from the options chunk at the top, so that messages and warnings aren't printed. If you are getting errors in your code, add `error = TRUE` so that the file knits. I would recommend not removing the `#` until you are completely finished.
+
+## Put it on GitHub!        
+
+From now on, GitHub should be part of your routine when doing assignments. I recommend making it part of your process anytime you are working in R, but I'll make you show it's part of your process for assignments.
+
+**Task**: When you are finished with the assignment, post a link below to the GitHub repo for the assignment. If you want to post it to your personal website, that's ok (not required). Make sure the link goes to a spot in the repo where I can easily find this assignment. For example, if you have a website with a blog and post the assignment as a blog post, link to the post's folder in the repo. As an example, I've linked to my GitHub stacking material [here](https://github.com/llendway/ads_website/tree/master/_posts/2021-03-22-stacking).
+
+
+
+## Regular Expressions
+
+**Tasks:**
+
+Either read in the data using the code below (need to install `googlesheets4` library if you don't have it) or download from [this](
+https://drive.google.com/file/d/12oqEt11miNGL_MtIcU75jx84pz6VEq_w/view?usp=sharing) URL and put it in your project folder.
+
+```{r}
+bestsellers <- read_sheet("https://docs.google.com/spreadsheets/d/1n3xKHK4-t5S73LgxOJVJWT5fMYjLj7kqmYl1LHkpk80/edit?usp=sharing")
+```
+
+**BE SURE TO REMOVE eval=FALSE** from all code sections.
+
+1. Find books with multiple authors (HINT: Consider the possibility of an author having “and” in their name)
+
+```{r, eval=FALSE}
+bestsellers %>% 
+  mutate(mult_auth =str_detect(author, " and ")) %>% 
+  filter(mult_auth)
+```
+
+2. Detect if the author’s first name starts with a vowel
+
+
+
+```{r, eval=FALSE}
+bestsellers %>% 
+  mutate(vowel = str_detect(author, "^[A, E, I, O, U]")) %>% 
+  filter(vowel)
+```
+
+3. Change all authors with the name Alexander to Alex
+
+```{r, eval=FALSE}
+bestsellers %>% 
+  mutate(names = str_replace_all(author, "Alexander", "Alex"))
+```
+
+4. Find books that are the second book in a series
+
+```{r, eval=FALSE}
+bestsellers %>%
+  mutate(series = str_detect(description, 
+                          pattern = "^(The second book)")) %>%
+  filter(series == TRUE)
+```
+
+5. Find books that are the third or fourth one in a series
+
+```{r, eval=FALSE}
+bestsellers %>%
+  mutate(series = str_detect(description, 
+                          pattern = "^(The fourth book)|(The third book)")) %>%
+  filter(series == TRUE)
+```
+
+6. Find books that are the 10th, 11th, ..., or 19th book in a series
+
+```{r, eval=FALSE}
+bestsellers %>%
+  mutate(series = str_detect(description, 
+                          pattern = "^(The (10|11|12|13|14|15|16|17|18|19)th book)")) %>%
+  filter(series == TRUE)
+```
+
+7. Describe in your own words how you would go about writing a regular expression for password pattern matching (ie 8 character minimum, one capital letter minimum, one lowercase letter minimum, one digit minimum, one special character minimum)
+
+This would be the pattern.
+
+^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]).{8,}$
+
+^ matches the beginning of the string.
+(?=.*[0-9]) requires that at least one digit appear anywhere in the string.
+(?=.*[a-z]) requires that at least one lowercase letter appear anywhere in the string.
+(?=.*[A-Z]) requires that at least one uppercase letter appear anywhere in the string.
+(?=.*[*.!@$%^&(){}[]:;<>,.?/~_+-=|\]) requires that at least one special character appear anywhere in the string.
+.{8,} requires that the password must be at least 8 characters long
+$ matches the end of the string.
+
+
+## `tmap` exercises
+
+Read in the data:
+
+```{r}
+data("World")
+```
+
+
+In addition to the World data, we will use data called **metro** that comes from the `tmap` package. It contains metropolitan area information from major cities across the globe. Some important variables include:
+
+* **Name** : city name
+* **pop2010** : population in 2010
+* **pop2020** : population in 2020
+
+
+```{r}
+data("metro")
+```
+
+
+**!!!!!!REMEMBER TO REMOVE eval=FALSE!!!!!!!!!!!**
+
+1. Make a world map using the base **World** dataset we used with the COVID example. Add information about income groups (income_grp) to the plot, specify a color palette.
+
+
+```{r, eval = FALSE}
+# let's explore the variable names of each dataset
+names(World)
+names(metro)
+```
+
+
+```{r}
+# Set your mode
+tm_shape(World) +
+    tm_polygons("income_grp", palette="-Blues", contrast= .5, id="name", title="Income group")
+```
+
+
+
+
+
+2. To the plot from (1), add the new dataset **metro** to the plot, and add information about cities' populations in 2020.
+
+```{r}
+tm_shape(World) +
+    tm_polygons("income_grp", palette="-Blues", contrast= .5, id="name", title="Income group") +
+  tm_shape(metro) +
+  tm_bubbles("pop2020")
+```
+
+
+
+
+
+3. Now, make a new plot with the World data that provides a look at country economic status and the inequality associated with each. 
+
+```{r}
+tm_shape(World) +
+  tm_polygons("economy") +
+  tm_bubbles("inequality", border.alpha = .5) +
+  tm_format("World_wide") 
+```
+
+
+
+
+4. Using a new data set, NDL_muni municipality data from the Netherlands, create a plot with two separate maps.  One showing the percentage of men per municipality of the whole country, and one showing the same but faceted by **province**.
+
+
+```{r, eval = FALSE}
+tmap_mode("plot")
+
+data(NLD_muni)
+
+NLD_muni$perc_men <- NLD_muni$pop_men / NLD_muni$population * 100
+
+tm1 <- tm_shape(NLD_muni) + tm_polygons("perc_men", palette = 'RdYlBu')
+
+tm2 <- tm_shape(NLD_muni) +
+    tm_polygons("perc_men", palette = "RdYlBu") +
+    tm_facets(by = "province")
+
+tmap_arrange(tm1, tm2)
+```
+
+
+## Data Ethics: Data visualization principles
+
+I'm hoping that the topic for this week is a review for all of you, but it's good to remind ourselves of these principles.  
+
+**Task:**
+
+Read both short articles in Week6. Data visualization section of [Calling Bulllshit](https://www.callingbullshit.org/syllabus.html#Visual). Were there any principles mentioned that you hadn't heard of before? What graph stood out for you as "the worst"? Did any of the graphs fool you? Or were able to overcome the bad practices (don't worry if they fool you - plently of them have fooled me, too.)? How does practicing good data visualization principles fit in with data ethics?
+
+I haven't heard of the principle of proportional ink before, and I also haven't associated a bar graph that does not contain 0 in the axes with violating the principle. The graph that stood out as the worst is the graph that has inverted y-axis. I would never thought to look at if the y-axis is inverted or not when I look at a graph. The bar graph that does not contain 0 also fools me.
+
+I think practicing good data visualization principles and avoiding to provide misleading information when doing data visualization is essential. It would be unethical to manipulate a graph to help you make a false point, and trick other people into thinking what you want other people to think. 
+
